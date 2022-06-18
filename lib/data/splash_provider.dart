@@ -14,7 +14,7 @@ class SplashProvider extends ChangeNotifier{
       Navigator.pushAndRemoveUntil
         (context, MaterialPageRoute(builder: (context)=>  LoginScreen()), (Route<dynamic> route) => false,):
       Navigator.pushAndRemoveUntil
-        (context, MaterialPageRoute(builder: (context)=>   HomeScreen()), (Route<dynamic> route) => false,);
+        (context, MaterialPageRoute(builder: (context)=>   const HomeScreen()), (Route<dynamic> route) => false,);
 
       notifyListeners();
     }

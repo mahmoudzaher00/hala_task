@@ -12,16 +12,17 @@ class SignInProvider extends ChangeNotifier {
   static SignInProvider get(context) => Provider.of<SignInProvider>(context,);
   SignInData signInData = SignInData();
   bool _password = true;
-
+  bool loading=false;
   bool get password => _password;
-
+  void loadingTrue(){
+    loading =true;
+    notifyListeners();
+  }
   void passwordVisible() {
     _password = !_password;
-
     print(_password);
     notifyListeners();
   }
-
   IconData passwordState() {
     if (password == true) {
       return Icons.visibility;
@@ -48,10 +49,11 @@ class SignInProvider extends ChangeNotifier {
 
   void sendDataToSignIn(context) {
     if (signInData.formKey.currentState!.validate()) {
+      loadingTrue();
       postLogin(
           email: signInData.textEditingEmailController.text,
           context: context,
-          password: signInData.textEditingPasswordController.text);
+          password: signInData.textEditingPasswordController.text).then((value) =>  loading = false );
     }
   }
 
@@ -79,6 +81,7 @@ class SignInProvider extends ChangeNotifier {
                 headers: head,
               ))
           .then((value) async {
+
         if (value.data['responseCode'] == 2) {
           showToast(
             message: value.data['responseMessage'],

@@ -63,11 +63,16 @@ class BuildInputsSignInFields extends StatelessWidget {
 
           ),
           const SizedBox(height: 20,),
+          controller.loading?
+          const CustomLoading():
+
           CustomButton(
-            text: 'دخول',
+            text: 'تسجيل جديد',
             background: AppColors.mainColorIndigo,
             height: 50,
-            onPressed:(){controller.sendDataToSignIn(context);}
+            onPressed:(){
+
+              controller.sendDataToSignIn(context);}
           ),
           SizedBox(height:  mediaQuery.height*.04,),
           Row(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:hala_task/data/sign_in_provider.dart';
 import 'package:hala_task/screens/auth/sign_up/sign_up_imports.dart';
 import 'package:hala_task/screens/home/home_imports.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,11 @@ class SignUpProvider extends ChangeNotifier {
   static SignUpProvider get(context) => Provider.of<SignUpProvider>(context,);
   SignUpData signUpData=SignUpData();
   bool _password = true;
+  bool loading=false;
+  void loadingTrue(){
+    loading =true;
+    notifyListeners();
+  }
   bool get password => _password;
   void passwordVisible() {
     _password = !_password;
@@ -18,6 +24,7 @@ class SignUpProvider extends ChangeNotifier {
     print(_password);
     notifyListeners();
   }
+
   IconData passwordState() {
 
     if (password == true) {
@@ -63,9 +70,11 @@ class SignUpProvider extends ChangeNotifier {
   void sendDataToRegister(context){
     if(signUpData.formKey.currentState!.validate()){
       if(signUpData.userRole==null){
+
         showToast(message: 'برجاء تحديد دور المستخدم',state: ToastStates.warning);
       }
       else{
+        loadingTrue();
         postSignUp(
           email: signUpData.textEditingEmailController.text,
           fullName: signUpData.textEditingFullNameController.text,
@@ -73,7 +82,7 @@ class SignUpProvider extends ChangeNotifier {
           password:signUpData.textEditingPasswordController.text,
           phoneNumber: signUpData.textEditingPhoneNumberController.text,
           roles: signUpData.userRole.toString(),
-        );
+        ).then((value) =>    loading = false);
       }
 
     }
@@ -85,7 +94,7 @@ class SignUpProvider extends ChangeNotifier {
   }
 
   Future<void> postSignUp ({required String email, required String fullName, required String password, required String phoneNumber, required String roles, required BuildContext context,}) async {
-
+    final ref=Provider.of<SignInProvider>(context,listen: false);
     var head = <String, String>{
       "Content-Type":'application/json',
     };
@@ -110,6 +119,7 @@ class SignUpProvider extends ChangeNotifier {
             headers: head,
           )
       ).then((value) async {
+
         if(value.data['responseCode']==2){
           showToast(
             message: value.data['dateSet'][0],
@@ -119,8 +129,8 @@ class SignUpProvider extends ChangeNotifier {
         }
         else {
           print(value.data['dateSet']);
-          Navigator.pushAndRemoveUntil
-            (context, MaterialPageRoute(builder: (context)=>  HomeScreen()), (Route<dynamic> route) => false,);
+          ref.postLogin(email: email, password: password, context: context);
+
 
         }
 

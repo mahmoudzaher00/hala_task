@@ -57,3 +57,26 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+class LBottom extends StatelessWidget {
+  Widget title;
+  VoidCallback function;
+  LBottom({Key? key, required this.function, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: function,
+      child: Container(
+        width:double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Center(
+            child: title
+        ),
+      ),
+    );
+  }
+}

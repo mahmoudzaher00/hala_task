@@ -114,15 +114,17 @@ class BuildInputsSignUpFields extends StatelessWidget {
             ],
 
           ),
+          controller.loading?
+          const CustomLoading():
           CustomButton(
-            // loading: true,
             text: 'تسجيل جديد',
             background: AppColors.mainColorIndigo,
             height: 50,
             onPressed: (){
-              controller.sendDataToRegister(context);
-            },
-          )
+               controller.sendDataToRegister(context);
+              },
+          ),
+
         ],
       ),
     );
