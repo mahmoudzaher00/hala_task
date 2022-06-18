@@ -1,13 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:hala_task/app/app_colors.dart';
-import 'package:hala_task/model/home_model.dart';
-import 'package:hala_task/model/test.dart';
-import 'package:hala_task/widgets/custom_text.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:provider/provider.dart';
-
-import '../../data/sign_in_provider.dart';
+part of'home_imports.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,111 +8,215 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  PagingController<int, Data> pagingController =
-      PagingController(firstPageKey: 1);
-  final int pageSize = 10;
-
-  bool servicesLoader = false;
-  var select;
-
-  HomeModel model = HomeModel(
-      fromDate: '2020-01-01',
-      toDate: '2022-05-01',
-      trxNumber: '',
-      userId: '',
-      filter: {"PageNumber": 0, "PageSize": 10});
-
-  Future<void> servicesFuture({required int pageKey}) async {
-    servicesLoader = true;
-
-    try {
-      var data = await Provider.of<SignInProvider>(context, listen: false)
-          .postUnBlock(pageKey: pageKey, pageNum: pageSize);
-
-      if (data != null) {
-        List<Data> adds = data.dateSet!.data!;
-
-        if (pageKey == 1) {
-          pagingController.itemList = [];
-        }
-        final isLastPage = adds.length < pageSize;
-        if (isLastPage) {
-          pagingController.appendLastPage(adds);
-        } else {
-          final nextPageKey = pageKey + 1;
-          pagingController.appendPage(adds, nextPageKey);
-        }
-      }
-
-      servicesLoader = false;
-    } catch (e) {
-      servicesLoader = false;
-      rethrow;
-    }
-  }
+  HomeData homeData=HomeData();
 
   @override
   void initState() {
-    servicesFuture(pageKey: 1);
-    pagingController.addPageRequestListener((pageKey) {
-      servicesFuture(pageKey: pageKey);
+
+    homeData.servicesFuture(pageKey: 1,context: context);
+    homeData.pagingController.addPageRequestListener((pageKey) {
+      homeData.servicesFuture(pageKey: pageKey,context: context);
     });
     super.initState();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    final ref = Provider.of<SignInProvider>(
-      context,
-    );
-    return Scaffold(
-        appBar: AppBar(
-          title: CustomText(
-            text: 'مدفوعات هلا',
-            color: AppColors.textColor,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+    final controller = Provider.of<HomeProvider>(context,);
+    final mediaQuery = MediaQuery.of(context).size;
+    return WillPopScope(
+      onWillPop:() {
+        return controller.homeData.displayLogoutDialog(context,'هل تريد الخروج من التطبيق',"");},
+      child: Scaffold(
+        backgroundColor: AppColors.homeBackGround,
+          appBar: AppBar(
+            backgroundColor: AppColors.homeBackGround,
+            elevation: 0,
+            centerTitle: true,
+            title: const CustomText(
+              text: 'مدفوعات هلا',
+              color: AppColors.textColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+            leading: InkWell(
+              onTap: (){
+                  controller.homeData.displayLogoutDialog(context,'هل تريد الخروج من التطبيق',"");
+              },
+                child: const Icon(Icons.arrow_back,color: AppColors.textColor,)),
           ),
-          leading: Icon(Icons.arrow_back),
-        ),
-        body: servicesLoader || ref.autoGenerate == null
-            ? Center(child: CircularProgressIndicator())
-            :
+          body:Consumer<HomeProvider>(
+            builder: (context, value, child) =>
+            value.homePaymentModel==null?
+            const Center(child: CircularProgressIndicator()):
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                  children:[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        BuildTotalPayment(mediaQuery: mediaQuery, controller: controller),
+                        BuildFilterSearch(mediaQuery: mediaQuery),
+                      ],
+                    ),
+                    Expanded(
+                      child: PagedListView<int, HomeDataModel>(
+                        pagingController: homeData.pagingController,
+                        padding: const EdgeInsets.only(bottom: 30),
+                        shrinkWrap: true,
+                        // physics: ScrollPhysics(),
+                        builderDelegate: PagedChildBuilderDelegate<HomeDataModel>(
+                          noItemsFoundIndicatorBuilder: (context) => const Text(''),
+                          firstPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator(),
+                          itemBuilder: (context, item, index) => Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)
+                            ),
+                            child: Container(
+                              width: mediaQuery.width,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: AppColors.white,
+                              ),
+                              child: ExpansionTile(
+                                title:  Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
 
-            // ListView.builder(
-            //         shrinkWrap: true,
-            //         physics: ScrollPhysics(),
-            //         itemCount: ref.autoGenerate!.dateSet!.data!.length,
-            //         itemBuilder: (context, index) {
-            //           return SizedBox(
-            //             height: 100,
-            //             child: Card(
-            //               child: CustomText(
-            //                 text:
-            //                     '${ref.autoGenerate!.dateSet!.data![index].fullNameAR}',
-            //               ),
-            //             ),
-            //           );
-            //         },
-            //       ),
+                                      children: [
+                                        const SizedBox(width: 8,),
+                                        CustomText(
+                                          text: '${item.fullNameAR}',
+                                          color: AppColors.mainColorIndigo,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                        const Expanded(child: SizedBox()),
 
-            PagedListView<int, Data>(
-                pagingController: pagingController,
-                padding: const EdgeInsets.only(bottom: 30),
-                shrinkWrap: true,
-                builderDelegate: PagedChildBuilderDelegate<Data>(
-                  noItemsFoundIndicatorBuilder: (context) => Text(''),
-                  firstPageProgressIndicatorBuilder: (_) =>
-                      CircularProgressIndicator(),
-                  itemBuilder: (context, item, index) => SizedBox(
-                    height: 100,
-                    child: Card(
-                      child: CustomText(
-                        text: '${item.fullNameAR}',
+                                        CustomText(
+                                          text: '${item.amount}',
+                                          color: const Color(0xffF03913),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10,),
+                                    Row(
+
+                                      children: [
+                                        const SizedBox(width: 10,),
+                                        CustomText(
+                                          text: '${item.userId}',
+                                          color: AppColors.textColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                        const Expanded(child: SizedBox()),
+                                        const CustomText(
+                                          text: 'ريال سعودي',
+                                          color: Color(0xff8C8C8C),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                childrenPadding: EdgeInsets.zero,
+                                tilePadding: EdgeInsets.zero,
+                                trailing: const SizedBox.shrink(),
+
+                                children: [
+                                  Container(
+                                    height: 80,
+                                    width: mediaQuery.width,
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: const Color(0xffF9FBFD),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children:  [
+                                            const CustomText(
+                                              text: 'رقم التحويل : ',
+                                              color:Color(0xff8C8C8C),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            CustomText(
+                                              text: '${item.trxRef}',
+                                              color:AppColors.textColor,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children:  [
+                                            const CustomText(
+                                              text: 'تاريخ التحويل : ',
+                                              color:Color(0xff8C8C8C),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            CustomText(
+                                              text: '${item.trxDate}',
+                                              color:AppColors.textColor,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children:  const [
+                                            CustomText(
+                                              text: 'اسم المنشأة : ',
+                                              color:Color(0xff8C8C8C),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                            CustomText(
+                                              text: 'ركن الأضواء',
+                                              color:AppColors.mainColorIndigo,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ],
+                                        ),
+
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ));
+                  ]),
+            ),
+          )),
+    );
+
   }
+
 }
+
+
+
+

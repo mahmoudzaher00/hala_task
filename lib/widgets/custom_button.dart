@@ -17,13 +17,13 @@ class CustomButton extends StatelessWidget {
   Widget? icon ;
   double? borderRadius;
   BorderRadius? borderRadiusObject ;
+
   CustomButton({Key? key,this.texFontWeight,this.borderRadius,this.borderRadiusObject,this.textSize = 16,this.text, this.icon, this.background , this.border,this.onPressed, this.width, this.height ,this.decoration ,this.textColor,this.loading =false }) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
-    return loading! ? const CircularProgressIndicator()
-        :
+    return loading! ? const CircularProgressIndicator() :
     InkWell(
       onTap: onPressed,
       child: Container(

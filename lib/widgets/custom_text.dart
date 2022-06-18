@@ -12,6 +12,7 @@ class CustomText extends StatelessWidget {
   final FontWeight fontWeight;
   final TextOverflow? textOverflow;
   final TextAlign? textAlign;
+  final TextDecoration? decoration;
 
   const CustomText({Key? key,
     this.text = '',
@@ -23,7 +24,8 @@ class CustomText extends StatelessWidget {
     this.width,
     this.fontWeight = FontWeight.bold,
     this.textOverflow,
-    this.textAlign
+    this.textAlign,
+    this.decoration
   }) : super(key: key);
 
   @override
@@ -40,7 +42,8 @@ class CustomText extends StatelessWidget {
               fontSize: fontSize,
               fontWeight: fontWeight,
               overflow: textOverflow,
-              fontFamily: 'Montserrat-Medium.ttf'
+              decoration: decoration,
+              fontFamily: 'din-next-lt-w23-regular.ttf'
             ),
 
           maxLines: maxLine,

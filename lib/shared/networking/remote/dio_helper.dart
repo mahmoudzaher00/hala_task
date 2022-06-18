@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -7,7 +9,7 @@ class DioHelper {
   static init() {
     dio = Dio(
       BaseOptions(
-        baseUrl: 'https://task.atc-servers.com/api/HalaTaskFlutter',
+        baseUrl: 'https://task.atc-servers.com/api/',
               connectTimeout: 50000,
               receiveTimeout: 30000,
               followRedirects: false,
@@ -53,7 +55,7 @@ class DioHelper {
     return dio!.post(
       url!,
       queryParameters: query,
-      data: data,
+      data: jsonEncode(data),
     );
   }
 

@@ -8,13 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.2"
-  bloc:
-    dependency: "direct main"
+  auto_size_text:
+    dependency: transitive
     description:
-      name: bloc
+      name: auto_size_text
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.0.3"
+    version: "3.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -64,13 +64,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.6"
-  equatable:
-    dependency: "direct main"
-    description:
-      name: equatable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -97,13 +90,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_bloc:
+  flutter_holo_date_picker:
     dependency: "direct main"
     description:
-      name: flutter_bloc
+      name: flutter_holo_date_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.0.1"
+    version: "1.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -121,6 +114,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fluttertoast:
+    dependency: "direct main"
+    description:
+      name: fluttertoast
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "8.0.9"
   http_parser:
     dependency: transitive
     description:
